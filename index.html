@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Caveat:wght@500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --midnight:#141130;
+    --violet:#2c2764;
+    --violet-soft:#433a86;
+    --lavender:#bfaee8;
+    --gold:#f0c078;
+    --blush:#f3cdc4;
+    --cream:#faf5ec;
+    --cream-dim:rgba(250,245,236,0.72);
+    --line: rgba(191,174,232,0.28);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--midnight);
+    color:var(--cream);
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+  }
+
+  .display{ font-family:'Cormorant Garamond', serif; }
+  .hand{ font-family:'Caveat', cursive; }
+
+  section{
+    position:relative;
+    width:100%;
+    padding: clamp(64px, 12vh, 140px) 24px;
+  }
+
+  .inner{
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---------- Ambient stars & fog (shared) ---------- */
+  .stars-bg{
+    position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;
+  }
+  .star-dot{
+    position:absolute;
+    width:2px; height:2px;
+    background: var(--cream);
+    border-radius:50%;
+    opacity:0.15;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:0.12; transform:scale(1); }
+    50%{ opacity:0.9; transform:scale(1.6); }
+  }
+  .fog{
+    position:absolute; border-radius:50%; filter: blur(60px);
+    opacity:0.25; animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift{
+    from{ transform: translate(0,0); }
+    to{ transform: translate(40px,-30px); }
+  }
+
+  /* ---------- HERO ---------- */
+  #hero{
+    min-height: 100svh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    background: radial-gradient(ellipse at 50% 20%, var(--violet-soft) 0%, var(--violet) 38%, var(--midnight) 78%);
+  }
+  .eyebrow{
+    font-size: clamp(12px,1.6vw,14px);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--lavender);
+    opacity:0;
+    animation: fadeUp 1.2s ease forwards;
+    animation-delay: 0.2s;
+  }
+  .name-huge{
+    font-size: clamp(64px, 15vw, 148px);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    margin: 18px 0 6px;
+    background: linear-gradient(180deg, #fff 0%, var(--lavender) 60%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 60px rgba(191,174,232,0.35);
+    opacity:0;
+    animation: fadeUp 1.4s ease forwards;
+    animation-delay: 0.5s;
+  }
+  .meaning{
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(16px, 2.4vw, 20px);
+    color: var(--cream-dim);
+    opacity:0;
+    animation: fadeUp 1.2s ease forwards;
+    animation-delay: 1s;
+  }
+  .meaning b{ color: var(--gold); font-weight:600; font-style:normal; }
+  .hero-line{
+    margin-top: 34px;
+    font-size: clamp(16px, 2.6vw, 20px);
+    color: var(--cream);
+    max-width: 520px;
+    margin-left:auto; margin-right:auto;
+    line-height:1.7;
+    opacity:0;
+    animation: fadeUp 1.2s ease forwards;
+    animation-delay: 1.5s;
+  }
+  @keyframes fadeUp{
+    from{ opacity:0; transform: translateY(16px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .scroll-cue{
+    position:absolute; bottom: 34px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:0.3em; text-transform:uppercase;
+    color: var(--cream-dim);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    opacity:0; animation: fadeUp 1s ease forwards; animation-delay:2.1s;
+  }
+  .scroll-cue span{
+    width:1px; height:34px; background: linear-gradient(var(--lavender), transparent);
+    animation: pulseLine 2s ease-in-out infinite;
+  }
+  @keyframes pulseLine{ 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+
+  /* ---------- fade-on-scroll utility ---------- */
+  .reveal{ opacity:0; transform: translateY(28px); transition: opacity 0.9s ease, transform 0.9s ease; }
+  .reveal.in{ opacity:1; transform: translateY(0); }
+
+  /* ---------- STORY / TIMELINE ---------- */
+  #story{ background: var(--midnight); }
+  .section-kicker{
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--gold);
+    font-size: clamp(28px, 4vw, 40px);
+    margin-bottom: 8px;
+  }
+  .section-sub{
+    text-align:center;
+    color: var(--cream-dim);
+    font-size:14px;
+    letter-spacing:0.08em;
+    margin-bottom: 64px;
+  }
+  .timeline{
+    position:relative;
+    padding-left: 28px;
+    border-left: 1px solid var(--line);
+  }
+  .t-item{
+    position:relative;
+    padding-bottom: 52px;
+  }
+  .t-item:last-child{ padding-bottom:0; }
+  .t-item::before{
+    content:'';
+    position:absolute;
+    left: -33px; top: 4px;
+    width: 9px; height:9px;
+    border-radius:50%;
+    background: var(--gold);
+    box-shadow: 0 0 14px 3px rgba(240,192,120,0.55);
+  }
+  .t-date{
+    font-family:'Caveat', cursive;
+    font-size: 26px;
+    color: var(--lavender);
+    display:block;
+    margin-bottom: 6px;
+  }
+  .t-text{
+    font-size: 17px;
+    line-height:1.75;
+    color: var(--cream);
+    max-width: 560px;
+  }
+
+  /* ---------- NICKNAMES ---------- */
+  #nicknames{
+    background: linear-gradient(180deg, var(--midnight) 0%, #1c1840 100%);
+  }
+  .nick-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+  }
+  @media (max-width:560px){ .nick-grid{ grid-template-columns: 1fr; } }
+  .nick-card{
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 32px 26px;
+    background: rgba(255,255,255,0.02);
+    text-align:center;
+  }
+  .nick-word{
+    font-family:'Caveat', cursive;
+    font-size: 44px;
+    color: var(--gold);
+    line-height:1;
+    margin-bottom: 14px;
+  }
+  .nick-desc{
+    font-size:15px;
+    line-height:1.7;
+    color: var(--cream-dim);
+  }
+
+  /* ---------- CONSTELLATION ---------- */
+  #constellation{
+    background: radial-gradient(ellipse at 50% 0%, #241f57 0%, var(--midnight) 60%);
+  }
+  .constellation-wrap{
+    position:relative;
+    height: 340px;
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+  @media (max-width:560px){ .constellation-wrap{ height: 300px; } }
+  .const-svg{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+  .const-svg line{
+    stroke: var(--gold);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
+  .star-btn{
+    position:absolute;
+    width: 16px; height:16px;
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    z-index:2;
+    transform: translate(-50%,-50%);
+    padding:0;
+  }
+  .star-btn::before{
+    content:'';
+    position:absolute; inset:0;
+    margin:auto;
+    width:7px; height:7px;
+    border-radius:50%;
+    background: var(--cream);
+    box-shadow: 0 0 10px 2px rgba(250,245,236,0.5);
+    animation: twinkle 3.2s ease-in-out infinite;
+    transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+  }
+  .star-btn.found::before{
+    background: var(--gold);
+    box-shadow: 0 0 20px 6px rgba(240,192,120,0.75);
+    animation: none;
+    transform: scale(1.6);
+  }
+  .const-hint{
+    text-align:center;
+    font-size:13px;
+    letter-spacing:0.05em;
+    color: var(--cream-dim);
+    margin-bottom: 6px;
+  }
+  .const-counter{
+    text-align:center;
+    font-family:'Caveat', cursive;
+    font-size:20px;
+    color: var(--lavender);
+    margin-bottom: 30px;
+  }
+  #revealed-list{
+    display:flex; flex-direction:column; gap:16px;
+    max-width: 560px; margin: 0 auto;
+  }
+  .revealed-line{
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(16px,2.3vw,19px);
+    line-height:1.6;
+    color: var(--cream);
+    border-left: 2px solid var(--gold);
+    padding-left: 16px;
+    opacity:0;
+    animation: fadeUp 0.8s ease forwards;
+  }
+  .const-done{
+    text-align:center;
+    margin-top: 40px;
+    font-size:15px;
+    color: var(--cream-dim);
+    opacity:0;
+    transition: opacity 0.8s ease;
+  }
+  .const-done.show{ opacity:1; }
+  .const-done a{
+    color: var(--gold);
+    text-decoration:none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom:2px;
+  }
+
+  /* ---------- CLOSING ---------- */
+  #closing{
+    min-height: 100svh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    background: radial-gradient(ellipse at 50% 60%, var(--violet-soft) 0%, var(--violet) 40%, var(--midnight) 85%);
+  }
+  .wish-btn{
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(20px,3vw,26px);
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid var(--lavender);
+    border-radius: 999px;
+    padding: 16px 38px;
+    cursor:pointer;
+    letter-spacing:0.02em;
+    transition: all 0.4s ease;
+  }
+  .wish-btn:hover{
+    background: rgba(191,174,232,0.12);
+    box-shadow: 0 0 30px rgba(191,174,232,0.35);
+  }
+  .shoot{
+    position:absolute;
+    width: 2px; height:2px;
+    background: var(--cream);
+    border-radius:50%;
+    box-shadow: 0 0 6px 1px rgba(250,245,236,0.8);
+    opacity:0;
+  }
+  .shoot.go{
+    animation: shootAcross 1.6s ease-out forwards;
+  }
+  @keyframes shootAcross{
+    0%{ opacity:1; transform: translate(0,0) rotate(-25deg) scaleX(1); }
+    100%{ opacity:0; transform: translate(-420px, 260px) rotate(-25deg) scaleX(1); }
+  }
+  .final-card{
+    max-width: 560px;
+    margin: 0 auto;
+    opacity:0; transform: scale(0.96);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .final-card.show{ opacity:1; transform: scale(1); }
+  .final-title{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size: clamp(30px,5vw,46px);
+    color: var(--cream);
+    margin-bottom: 22px;
+  }
+  .final-title b{ color: var(--gold); font-weight:600; }
+  .final-body{
+    font-size: clamp(15px,2.2vw,17px);
+    line-height:1.85;
+    color: var(--cream-dim);
+    margin-bottom: 30px;
+  }
+  .signature{
+    font-family:'Caveat', cursive;
+    font-size: 30px;
+    color: var(--gold);
+  }
+  .sub-date{
+    margin-top:8px;
+    font-size:12px;
+    letter-spacing:0.1em;
+    color: var(--cream-dim);
+    text-transform:uppercase;
+  }
+  #wish-launcher{ position:relative; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="stars-bg" id="hero-stars"></div>
+  <div class="fog" style="width:340px;height:340px;background:var(--lavender);top:10%;left:8%;"></div>
+  <div class="fog" style="width:280px;height:280px;background:var(--gold);bottom:8%;right:10%;animation-delay:6s;"></div>
+  <div class="inner">
+    <div class="eyebrow">for Sapna</div>
+    <div class="name-huge display">Sapna</div>
+    <p class="hero-line">Nine years ago, in a small home tuition neither of us walked into for love, my life quietly started dreaming of you. It hasn't stopped since.</p>
+  </div>
+  <div class="scroll-cue"><span></span>scroll</div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="inner">
+    <div class="section-kicker display reveal">Our story so far</div>
+    <div class="section-sub reveal">a timeline, told slowly</div>
+    <div class="timeline">
+      <div class="t-item reveal">
+        <span class="t-date">9th class, home tuition</span>
+        <p class="t-text">No bench, no board — just a small home tuition and two students who kept getting seated together. We tried changing seats more than once. Fate quietly put us back side by side, every single time.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">the concepts I never got the first time</span>
+        <p class="t-text">You were the one who explained things until they finally made sense to me — patiently, without ever making me feel slow for asking twice. I think some part of me liked not understanding, just to hear you explain it again.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">outside your school gate</span>
+        <p class="t-text">You'd call me to come meet you there, and I'd walk the whole way just for a few minutes with you. And on the days we took an auto back, you'd pay the fare before I could even reach for my pocket. Small thing. I never forgot it.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">11th class, a new stream</span>
+        <p class="t-text">I chose commerce — not because I loved it, but because it meant I could switch tuitions and be in the same one as you. Still the best subject decision I never regret.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">ten minutes, every day</span>
+        <p class="t-text">We started going early, just to get a few private minutes before anyone else arrived. Ten minutes a day, and somehow it was always the best part of mine.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">27th December, 2017 — the stairs</span>
+        <p class="t-text">You were the one who said it first — "let's hug." And it happened, unplanned, right there on the stairs, on our way back home. I still remember exactly how that moment felt. Hugs came easier after that. Then, one day, a kiss on the cheek — still one of the best moments of my life. And you still love teasing me until I giggle, pressing my waist just to watch me lose it.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">the fights, the short breakups</span>
+        <p class="t-text">We fought. We broke up, briefly, more than once. And every single time, we came back steadier — more patient, more understanding, more in love than before, not less.</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-date">today</span>
+        <p class="t-text">Studies done, jobs done, and we're still here — still talking, still sharing everything. You still get your mood swings, and I try, as patiently as I can, to hold you through them — because underneath it, you're just so cute and so innocent, and entirely worth the patience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NICKNAMES -->
+<section id="nicknames">
+  <div class="inner">
+    <div class="section-kicker display reveal">Cutee &amp; Nakli</div>
+    <div class="section-sub reveal">the names only we use</div>
+    <div class="nick-grid">
+      <div class="nick-card reveal">
+        <div class="nick-word">Cutee</div>
+        <p class="nick-desc">What I call you when you're being impossibly you — half-annoyed, half-smiling, pretending my jokes aren't funny while laughing anyway. And still the only person who can make me giggle just by teasing my waist.</p>
+      </div>
+      <div class="nick-card reveal">
+        <div class="nick-word">Nakli</div>
+        <p class="nick-desc">What you call me back, every single time, like it's still the funniest comeback in the world. Nine years and it still works on me.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONSTELLATION -->
+<section id="constellation">
+  <div class="inner">
+    <div class="section-kicker display reveal">A dream made of small reasons</div>
+    <div class="const-hint reveal">tap each star</div>
+    <div class="const-counter reveal"><span id="found-count">0</span> of 8 found</div>
+
+    <div class="constellation-wrap reveal">
+      <svg class="const-svg" id="const-svg"></svg>
+      <!-- positions as % of container -->
+      <button class="star-btn" style="top:16%; left:10%;" data-i="0" aria-label="star"></button>
+      <button class="star-btn" style="top:8%; left:40%;" data-i="1" aria-label="star"></button>
+      <button class="star-btn" style="top:24%; left:68%;" data-i="2" aria-label="star"></button>
+      <button class="star-btn" style="top:12%; left:92%;" data-i="3" aria-label="star"></button>
+      <button class="star-btn" style="top:50%; left:22%;" data-i="4" aria-label="star"></button>
+      <button class="star-btn" style="top:58%; left:56%;" data-i="5" aria-label="star"></button>
+      <button class="star-btn" style="top:46%; left:84%;" data-i="6" aria-label="star"></button>
+      <button class="star-btn" style="top:84%; left:44%;" data-i="7" aria-label="star"></button>
+    </div>
+
+    <div id="revealed-list"></div>
+    <div class="const-done" id="const-done">that's all eight. there's one more thing below — <a href="#closing">go look</a></div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section id="closing">
+  <div class="stars-bg" id="closing-stars"></div>
+  <div class="inner" id="wish-launcher">
+    <div id="pre-wish">
+      <p class="hero-line" style="margin-bottom:36px;">Sapna means dream. So make one — just for tonight.</p>
+      <button class="wish-btn" id="wish-btn">make a wish ✦</button>
+    </div>
+    <div class="final-card" id="final-card">
+      <div class="final-title display">I love you, <b>Sapna.</b></div>
+      <p class="final-body">Every version of you — the one who explained things to me twice without complaint, the one who quietly paid the auto fare, the one who said "let's hug" first, the one who gets stubborn mid-fight and soft five minutes later, the one who's stayed through nine years of my worst moods without once making it feel like a burden. If I got to choose again, from that first home tuition, I'd still choose you. Every single time.</p>
+      <div class="signature">— Abhishek, your Nakli</div>
+      <div class="sub-date">7th August 2026 &nbsp;·&nbsp; but really, every day since 27.12.2017</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---------- ambient star fields ----------
+  function scatterStars(containerId, count){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    for(let i=0;i<count;i++){
+      const d = document.createElement('div');
+      d.className = 'star-dot';
+      d.style.top = Math.random()*100 + '%';
+      d.style.left = Math.random()*100 + '%';
+      d.style.animationDelay = (Math.random()*4) + 's';
+      d.style.animationDuration = (3 + Math.random()*3) + 's';
+      el.appendChild(d);
+    }
+  }
+  scatterStars('hero-stars', 70);
+  scatterStars('closing-stars', 60);
+
+  // ---------- scroll reveal ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el=>io.observe(el));
+
+  // ---------- constellation ----------
+  const reasons = [
+    "You explained every concept I didn't get the first time — patiently, every single time, without ever making me feel slow for it.",
+    "You paid the auto fare before I could even reach for my pocket, and never once made it a thing.",
+    "I picked an entire stream in 11th class just for ten private minutes a day with you. Zero regrets, nine years later.",
+    "You were the one who said 'let's hug' first, on those stairs. I've been grateful for your courage ever since.",
+    "You still tease me until I giggle, and somehow that's become one of my favourite sounds in the world.",
+    "We broke up more than once, briefly — and every single time, we came back knowing each other better than before.",
+    "Jobs, years, distance, mood swings — nothing has ever been enough to make you stop showing up for me.",
+    "Sapna means dream. Nine years later, you're still the only dream I've never wanted to wake up from."
+  ];
+
+  const stars = document.querySelectorAll('.star-btn');
+  const svg = document.getElementById('const-svg');
+  const wrap = document.querySelector('.constellation-wrap');
+  const list = document.getElementById('revealed-list');
+  const countEl = document.getElementById('found-count');
+  const doneEl = document.getElementById('const-done');
+  let lastClicked = null;
+  let foundCount = 0;
+
+  function starCenter(starEl){
+    const wrapRect = wrap.getBoundingClientRect();
+    const r = starEl.getBoundingClientRect();
+    return {
+      x: r.left - wrapRect.left + r.width/2,
+      y: r.top - wrapRect.top + r.height/2
+    };
+  }
+
+  stars.forEach(star=>{
+    star.addEventListener('click', ()=>{
+      if(star.classList.contains('found')) return;
+      star.classList.add('found');
+      foundCount++;
+      countEl.textContent = foundCount;
+
+      const idx = parseInt(star.getAttribute('data-i'), 10);
+      const p = document.createElement('p');
+      p.className = 'revealed-line';
+      p.textContent = reasons[idx];
+      list.appendChild(p);
+
+      if(lastClicked){
+        const a = starCenter(lastClicked);
+        const b = starCenter(star);
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+        line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+        svg.appendChild(line);
+      }
+      lastClicked = star;
+
+      if(foundCount === stars.length){
+        doneEl.classList.add('show');
+      }
+    });
+  });
+
+  // ---------- closing: make a wish ----------
+  const wishBtn = document.getElementById('wish-btn');
+  const preWish = document.getElementById('pre-wish');
+  const finalCard = document.getElementById('final-card');
+  const launcher = document.getElementById('wish-launcher');
+
+  wishBtn.addEventListener('click', ()=>{
+    // shooting star burst
+    for(let i=0;i<5;i++){
+      setTimeout(()=>{
+        const s = document.createElement('div');
+        s.className = 'shoot';
+        s.style.top = (10 + Math.random()*30) + '%';
+        s.style.right = (Math.random()*20) + '%';
+        launcher.appendChild(s);
+        requestAnimationFrame(()=> s.classList.add('go'));
+        setTimeout(()=> s.remove(), 1700);
+      }, i*160);
+    }
+    preWish.style.transition = 'opacity 0.6s ease';
+    preWish.style.opacity = '0';
+    setTimeout(()=>{
+      preWish.style.display = 'none';
+      finalCard.classList.add('show');
+    }, 500);
+  });
+</script>
+
+</body>
+</html>
